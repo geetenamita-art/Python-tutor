@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Investment Analyst Agent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-blue: #0f62fe;
+      --primary-hover: #0043ce;
+      --bg-page: #f8f9fa;
+      --bg-card: #ffffff;
+      --text-dark: #161616;
+      --text-muted: #525252;
+      --text-light: #8d8d8d;
+      --border-color: #e0e0e0;
+      --chat-bubble-user: #e8e8e8;
+      --table-header: #e0e0e0;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --shadow-subtle: 0 2px 8px rgba(0, 0, 0, 0.05);
+      --shadow-floating: 0 10px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-dark);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navigation Header */
+    .header {
+      background-color: #ffffff;
+      border-bottom: 1px solid var(--border-color);
+      padding: 0.85rem 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .brand-icon-box {
+      width: 36px;
+      height: 36px;
+      background-color: var(--primary-blue);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+
+    .brand-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      letter-spacing: -0.01em;
+    }
+
+    .brand-subtitle {
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: var(--text-light);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .agent-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      background-color: #f6fdf9;
+      border: 1px solid #a7f3d0;
+      padding: 0.35rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #059669;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      background-color: #10b981;
+      border-radius: 50%;
+      box-shadow: 0 0 6px #10b981;
+    }
+
+    /* Hero Center Section */
+    .hero-container {
+      max-width: 960px;
+      margin: 2.2rem auto 1.8rem auto;
+      text-align: center;
+      padding: 0 1.5rem;
+    }
+
+    .hero-title {
+      font-size: 2.15rem;
+      font-weight: 800;
+      color: #121619;
+      margin-bottom: 0.65rem;
+      letter-spacing: -0.02em;
+    }
+
+    .hero-desc {
+      font-size: 0.98rem;
+      color: var(--text-muted);
+      max-width: 820px;
+      margin: 0 auto 1.5rem auto;
+      line-height: 1.6;
+    }
+
+    /* Action Filter Pills */
+    .filter-pills {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.65rem;
+      margin-bottom: 1rem;
+    }
+
+    .filter-pill {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      padding: 0.45rem 1rem;
+      border-radius: 24px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-dark);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow-subtle);
+    }
+
+    .filter-pill:hover {
+      border-color: var(--primary-blue);
+      color: var(--primary-blue);
+      transform: translateY(-1px);
+    }
+
+    /* Main Grid: Analysis Workflow vs Chat Window */
+    .main-grid {
+      max-width: 1300px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 0 2rem 3rem 2rem;
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 1.75rem;
+      align-items: flex-start;
+    }
+
+    .panel-header-title {
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-light);
+      margin-bottom: 0.85rem;
+    }
+
+    /* Left: Analysis Workflow Card */
+    .workflow-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      box-shadow: var(--shadow-subtle);
+    }
+
+    .workflow-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 1.35rem;
+    }
+
+    .workflow-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .step-number {
+      width: 28px;
+      height: 28px;
+      background-color: var(--primary-blue);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .step-content h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 0.2rem;
+    }
+
+    .step-content p {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    /* Right: Floating / Docked Side AI Agent Card */
+    .chat-card {
+      position: fixed;
+      right: 28px;
+      bottom: 0;
+      width: 440px;
+      height: 640px;
+      max-height: 85vh;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-bottom: none;
+      border-radius: 16px 16px 0 0;
+      box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.15), 0 0 10px rgba(0, 0, 0, 0.05);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 1000;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), height 0.3s ease;
+    }
+
+    .chat-card.minimized {
+      height: 48px;
+      overflow: hidden;
+    }
+
+    /* Chat Card Header */
+    .chat-card-header {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #ffffff;
+    }
+
+    .agent-header-info {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+    }
+
+    .icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      padding: 4px;
+      border-radius: 4px;
+      transition: background 0.15s ease;
+    }
+
+    .icon-btn:hover {
+      background-color: #f1f1f1;
+    }
+
+    .agent-avatar-icon {
+      width: 24px;
+      height: 24px;
+      background-color: var(--primary-blue);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+    }
+
+    .agent-title-text {
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    .ai-badge {
+      border: 1px solid #c6c6c6;
+      border-radius: 4px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 1px 5px;
+      color: var(--text-muted);
+    }
+
+    /* Chat Messages Body */
+    .chat-messages {
+      flex: 1;
+      padding: 1rem 1.25rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.15rem;
+      background-color: #ffffff;
+      position: relative;
+    }
+
+    .date-divider {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-light);
+      margin: 0.2rem 0;
+      font-weight: 500;
+    }
+
+    /* User Message */
+    .message-user-wrap {
+      align-self: flex-end;
+      max-width: 85%;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.25rem;
+    }
+
+    .message-user-bubble {
+      background-color: var(--chat-bubble-user);
+      color: var(--text-dark);
+      padding: 0.75rem 1rem;
+      border-radius: 12px 12px 2px 12px;
+      font-size: 0.88rem;
+      line-height: 1.45;
+    }
+
+    .message-timestamp {
+      font-size: 0.72rem;
+      color: var(--text-light);
+    }
+
+    /* Agent Message */
+    .message-agent-wrap {
+      align-self: flex-start;
+      width: 100%;
+      display: flex;
+      gap: 0.65rem;
+    }
+
+    .agent-bot-avatar {
+      width: 28px;
+      height: 28px;
+      background-color: var(--primary-blue);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .message-agent-content {
+      flex: 1;
+      font-size: 0.88rem;
+      color: var(--text-dark);
+      line-height: 1.5;
+    }
+
+    .agent-meta-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.78rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .agent-name-label {
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    .report-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      margin-top: 0.4rem;
+    }
+
+    .report-main-title {
+      font-size: 0.98rem;
+      font-weight: 800;
+      color: var(--text-dark);
+    }
+
+    .report-date {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+    }
+
+    .section-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      margin: 0.85rem 0 0.45rem 0;
+      color: #121619;
+    }
+
+    /* Financial Table Styling */
+    .custom-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+      margin-bottom: 0.75rem;
+      border: 1px solid var(--border-color);
+    }
+
+    .custom-table th {
+      background-color: #ededed;
+      color: var(--text-dark);
+      text-align: left;
+      padding: 6px 10px;
+      font-weight: 700;
+      border: 1px solid var(--border-color);
+    }
+
+    .custom-table td {
+      padding: 6px 10px;
+      border: 1px solid var(--border-color);
+      color: var(--text-dark);
+    }
+
+    .tag-recommendation {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 0.82rem;
+    }
+
+    .tag-buy {
+      background-color: #defbe6;
+      color: #0e6027;
+      border: 1px solid #a7f3d0;
+    }
+
+    .tag-hold {
+      background-color: #fef3c7;
+      color: #92400e;
+      border: 1px solid #fde68a;
+    }
+
+    /* Floating Scroll Down Button */
+    .scroll-down-btn {
+      position: absolute;
+      bottom: 70px;
+      right: 20px;
+      width: 32px;
+      height: 32px;
+      background-color: #262626;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+      transition: transform 0.2s;
+    }
+
+    .scroll-down-btn:hover {
+      transform: scale(1.1);
+    }
+
+    /* Chat Input Bar */
+    .chat-input-bar {
+      border-top: 1px solid var(--border-color);
+      padding: 0.75rem 1rem;
+      background-color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .chat-input-field {
+      flex: 1;
+      border: 1px solid #c6c6c6;
+      border-radius: 20px;
+      padding: 0.65rem 1rem;
+      font-size: 0.86rem;
+      font-family: inherit;
+      outline: none;
+      transition: border 0.15s ease;
+    }
+
+    .chat-input-field:focus {
+      border-color: var(--primary-blue);
+    }
+
+    .send-btn {
+      width: 36px;
+      height: 36px;
+      background-color: #d1d5db;
+      border: none;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .send-btn.active {
+      background-color: var(--primary-blue);
+    }
+
+    @media (max-width: 900px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="header">
+    <div class="brand-group">
+      <div class="brand-icon-box">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+          <polyline points="17 6 23 6 23 12"></polyline>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-title">Investment Analyst Agent</div>
+        <div class="brand-subtitle">POWERED BY IBM WATSONX ORCHESTRATE</div>
+      </div>
+    </div>
+
+    <div class="agent-status-badge">
+      <span class="status-dot"></span>
+      <span>Agent Online</span>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-container">
+    <h1 class="hero-title">Your AI-Powered Investment Analyst</h1>
+    <p class="hero-desc">
+      Get structured, data-driven financial analysis on any stock or company — including financials, sentiment, competitor benchmarks, risk factors, and a clear Buy / Hold / Sell recommendation.
+    </p>
+
+    <!-- Filter Action Chips -->
+    <div class="filter-pills">
+      <button class="filter-pill" onclick="sendQuickPrompt('Analyze the stock performance and valuation of Tata Consultancy Services (TCS)')">
+        <span>📈</span> Stock Analysis
+      </button>
+      <button class="filter-pill" onclick="sendQuickPrompt('Calculate key financial ratios for Reliance Industries (P/E, ROE, Debt-to-Equity)')">
+        <span>🔥</span> Financial Ratios
+      </button>
+      <button class="filter-pill" onclick="sendQuickPrompt('Compare TCS with major competitors Infosys, Wipro, and HCL Tech')">
+        <span>🏢</span> Competitor Comparison
+      </button>
+      <button class="filter-pill" onclick="sendQuickPrompt('Analyze the current market sentiment and news mood for HDFC Bank')">
+        <span>📰</span> Market Sentiment
+      </button>
+      <button class="filter-pill" onclick="sendQuickPrompt('Evaluate the key downside risks and macro headwinds for Tata Motors')">
+        <span>⚠️</span> Risk Assessment
+      </button>
+      <button class="filter-pill" onclick="sendQuickPrompt('Identify long-term growth opportunities and expansion catalysts for Infosys')">
+        <span>🌿</span> Growth Opportunities
+      </button>
+    </div>
+  </section>
+
+  <!-- Two Column Layout -->
+  <main class="main-grid">
+    <!-- Left Column: Analysis Workflow -->
+    <div>
+      <div class="panel-header-title">ANALYSIS WORKFLOW</div>
+      <div class="workflow-card">
+        <div class="workflow-steps">
+          
+          <div class="workflow-step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <h4>Company Identification</h4>
+              <p>Identify the stock or company from your input — by ticker symbol, full name, or ISIN.</p>
+            </div>
+          </div>
+
+          <div class="workflow-step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <h4>Financial Summary</h4>
+              <p>Collect revenue, net profit, EPS, market cap, P/E, ROE, ROA, Debt-to-Equity, cash flow, and recent price performance.</p>
+            </div>
+          </div>
+
+          <div class="workflow-step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <h4>Market Sentiment Analysis</h4>
+              <p>Analyse recent news and classify overall market mood as Positive, Neutral, or Negative.</p>
+            </div>
+          </div>
+
+          <div class="workflow-step">
+            <div class="step-number">4</div>
+            <div class="step-content">
+              <h4>Competitor Comparison</h4>
+              <p>Benchmark key metrics against major industry peers using a side-by-side table.</p>
+            </div>
+          </div>
+
+          <div class="workflow-step">
+            <div class="step-number">5</div>
+            <div class="step-content">
+              <h4>Risk & Opportunity Assessment</h4>
+              <p>Evaluate internal company risks, macroeconomic headwinds, regulatory factors, and growth drivers.</p>
+            </div>
+          </div>
+
+          <div class="workflow-step">
+            <div class="step-number">6</div>
+            <div class="step-content">
+              <h4>Buy / Hold / Sell Recommendation</h4>
+              <p>Synthesize findings into an actionable investment thesis with target price valuation and risk rating.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Chat with the Analyst -->
+    <div>
+      <div class="panel-header-title">CHAT WITH THE ANALYST</div>
+      <div class="chat-card" id="chatCard">
+        
+        <!-- Header -->
+        <div class="chat-card-header" style="cursor: pointer;" onclick="if(event.target.tagName !== 'BUTTON' && event.target.tagName !== 'svg') toggleMinimize()">
+          <div class="agent-header-info">
+            <button class="icon-btn" onclick="event.stopPropagation(); resetChat()" title="Reset Conversation">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+                <path d="M21 3v5h-5"></path>
+                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+                <path d="M3 21v-5h5"></path>
+              </svg>
+            </button>
+            <div class="agent-avatar-icon">💬</div>
+            <div class="agent-title-text">Sequential Task Agent-Investment Analyst</div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="ai-badge">AI</span>
+            <button class="icon-btn" onclick="event.stopPropagation(); toggleMinimize()" title="Minimize / Expand">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Chat Messages -->
+        <div class="chat-messages" id="chatMessages">
+          <div class="date-divider">Today</div>
+
+          <!-- Sample User Query from Screenshot -->
+          <div class="message-user-wrap">
+            <div class="message-user-bubble">
+              Analyze the financial performance of Tata Consultancy Services (TCS).
+            </div>
+            <div class="message-timestamp">You 10:38 PM</div>
+          </div>
+
+          <!-- Sample Sequential Agent Response from Screenshot -->
+          <div class="message-agent-wrap">
+            <div class="agent-bot-avatar">💬</div>
+            <div class="message-agent-content">
+              <div class="agent-meta-header">
+                <span class="agent-name-label">Sequential Task Agent-Investment Analyst</span>
+                <span class="message-timestamp">10:38 PM</span>
+              </div>
+
+              <div class="report-card">
+                <div class="report-main-title">Tata Consultancy Services Ltd. (TCS) – Financial Performance Review</div>
+                <div class="report-date">Prepared: 21 July 2026</div>
+
+                <div class="section-title">1. Scope & Sources</div>
+                <table class="custom-table">
+                  <thead>
+                    <tr>
+                      <th>Item</th>
+                      <th>Source</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>FY 2025 Annual Report (FY ending 31 Mar 2025)</td>
+                      <td>TCS Investor Relations</td>
+                    </tr>
+                    <tr>
+                      <td>Q3 FY-2026 earnings release</td>
+                      <td>TCS Press Release</td>
+                    </tr>
+                    <tr>
+                      <td>Consensus Estimates & Market Data</td>
+                      <td>NSE / BSE Data Feed</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div class="section-title">2. Financial Highlights & Ratios</div>
+                <table class="custom-table">
+                  <thead>
+                    <tr>
+                      <th>Metric</th>
+                      <th>Reported Value</th>
+                      <th>Peer Average</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Revenue (TTM)</td>
+                      <td>₹240,893 Cr (+6.8% YoY)</td>
+                      <td>+5.4% YoY</td>
+                    </tr>
+                    <tr>
+                      <td>Operating Margin (EBIT)</td>
+                      <td>24.6%</td>
+                      <td>21.2%</td>
+                    </tr>
+                    <tr>
+                      <td>P/E Ratio</td>
+                      <td>28.4x</td>
+                      <td>26.9x</td>
+                    </tr>
+                    <tr>
+                      <td>Return on Equity (ROE)</td>
+                      <td>48.2%</td>
+                      <td>32.5%</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div class="section-title">3. Market Sentiment & Peer Comparison</div>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+                  <strong>Market Sentiment:</strong> Positive (78/100). Resilient order book with $10.2B in quarterly Total Contract Value (TCV).
+                </p>
+
+                <div class="section-title">4. Recommendation</div>
+                <div>
+                  <span class="tag-recommendation tag-buy">BUY / ACCUMULATE</span>
+                  <span style="font-size: 0.8rem; margin-left: 8px; color: var(--text-muted);">
+                    Target Price: ₹4,450 | Horizon: 12 Months
+                  </span>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Floating Scroll Button -->
+        <button class="scroll-down-btn" onclick="scrollToBottom()" title="Scroll to bottom">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+
+        <!-- Input Box -->
+        <div class="chat-input-bar">
+          <input 
+            type="text" 
+            id="chatInput" 
+            class="chat-input-field" 
+            placeholder="Type something..." 
+            onkeydown="if(event.key === 'Enter') handleSend()"
+            oninput="toggleSendBtn()"
+          />
+          <button id="sendBtn" class="send-btn" onclick="handleSend()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const chatMessages = document.getElementById("chatMessages");
+    const chatInput = document.getElementById("chatInput");
+    const sendBtn = document.getElementById("sendBtn");
+
+    function toggleSendBtn() {
+      if (chatInput.value.trim().length > 0) {
+        sendBtn.classList.add("active");
+      } else {
+        sendBtn.classList.remove("active");
+      }
+    }
+
+    function toggleMinimize() {
+      const card = document.getElementById("chatCard");
+      if (card) {
+        card.classList.toggle("minimized");
+      }
+    }
+
+    function scrollToBottom() {
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function sendQuickPrompt(promptText) {
+      chatInput.value = promptText;
+      handleSend();
+    }
+
+    function resetChat() {
+      if (confirm("Reset conversation with Sequential Task Agent?")) {
+        location.reload();
+      }
+    }
+
+    function handleSend() {
+      const text = chatInput.value.trim();
+      if (!text) return;
+
+      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      // Add user message
+      const userHtml = `
+        <div class="message-user-wrap">
+          <div class="message-user-bubble">${escapeHtml(text)}</div>
+          <div class="message-timestamp">You ${time}</div>
+        </div>
+      `;
+      chatMessages.insertAdjacentHTML("beforeend", userHtml);
+      chatInput.value = "";
+      toggleSendBtn();
+      scrollToBottom();
+
+      // Typing indicator
+      const typingId = "typing-" + Date.now();
+      const typingHtml = `
+        <div id="${typingId}" class="message-agent-wrap">
+          <div class="agent-bot-avatar">💬</div>
+          <div class="message-agent-content">
+            <div class="agent-meta-header">
+              <span class="agent-name-label">Sequential Task Agent-Investment Analyst</span>
+              <span class="message-timestamp">${time}</span>
+            </div>
+            <div style="font-size: 0.85rem; color: var(--text-muted); font-style: italic;">
+              Executing sequential task: [1] Company ID → [2] Financial Summary → [3] Sentiment...
+            </div>
+          </div>
+        </div>
+      `;
+      chatMessages.insertAdjacentHTML("beforeend", typingHtml);
+      scrollToBottom();
+
+      setTimeout(() => {
+        const typingEl = document.getElementById(typingId);
+        if (typingEl) typingEl.remove();
+        generateAgentResponse(text, time);
+      }, 1000);
+    }
+
+    function generateAgentResponse(query, time) {
+      const q = query.toLowerCase();
+      let company = "Tata Consultancy Services Ltd. (TCS)";
+      let ticker = "TCS.NS";
+      let pe = "28.4x";
+      let roe = "48.2%";
+      let rev = "₹240,893 Cr (+6.8% YoY)";
+      let verdict = "BUY / ACCUMULATE";
+      let target = "₹4,450";
+      let tagClass = "tag-buy";
+
+      if (q.includes("reliance")) {
+        company = "Reliance Industries Ltd. (RIL)";
+        ticker = "RELIANCE.NS";
+        pe = "26.1x";
+        roe = "12.8%";
+        rev = "₹901,230 Cr (+8.2% YoY)";
+        verdict = "BUY / OUTPERFORM";
+        target = "₹3,200";
+      } else if (q.includes("infosys") || q.includes("infy")) {
+        company = "Infosys Limited";
+        ticker = "INFY.NS";
+        pe = "24.8x";
+        roe = "31.4%";
+        rev = "₹153,670 Cr (+4.9% YoY)";
+        verdict = "ACCUMULATE";
+        target = "₹1,850";
+      } else if (q.includes("hdfc")) {
+        company = "HDFC Bank Ltd.";
+        ticker = "HDFCBANK.NS";
+        pe = "18.2x";
+        roe = "16.5%";
+        rev = "₹215,400 Cr Net Interest Income";
+        verdict = "STRONG BUY";
+        target = "₹1,950";
+      } else if (q.includes("apple") || q.includes("aapl")) {
+        company = "Apple Inc. (AAPL)";
+        ticker = "AAPL (NASDAQ)";
+        pe = "32.5x";
+        roe = "147.2%";
+        rev = "$385.6 Billion";
+        verdict = "HOLD / MODERATE BUY";
+        target = "$245";
+        tagClass = "tag-hold";
+      }
+
+      const responseHtml = `
+        <div class="message-agent-wrap">
+          <div class="agent-bot-avatar">💬</div>
+          <div class="message-agent-content">
+            <div class="agent-meta-header">
+              <span class="agent-name-label">Sequential Task Agent-Investment Analyst</span>
+              <span class="message-timestamp">${time}</span>
+            </div>
+
+            <div class="report-card">
+              <div class="report-main-title">${company} – Financial Performance Review</div>
+              <div class="report-date">Prepared: ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+
+              <div class="section-title">1. Scope & Sources</div>
+              <table class="custom-table">
+                <thead>
+                  <tr><th>Item</th><th>Source</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Audited Annual Accounts & Ticker [${ticker}]</td><td>Regulatory Filings & Investor Relations</td></tr>
+                  <tr><td>Quarterly Earnings Digest</td><td>Company Press Release</td></tr>
+                  <tr><td>Market Consensus & Sentiment Ratios</td><td>Bloomberg / Refinitiv Consensus</td></tr>
+                </tbody>
+              </table>
+
+              <div class="section-title">2. Key Financial Highlights</div>
+              <table class="custom-table">
+                <thead>
+                  <tr><th>Metric</th><th>Reported Value</th><th>Industry Benchmark</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Revenue (TTM)</td><td>${rev}</td><td>Solid Topline</td></tr>
+                  <tr><td>Price to Earnings (P/E)</td><td>${pe}</td><td>In-line with historical range</td></tr>
+                  <tr><td>Return on Equity (ROE)</td><td>${roe}</td><td>Upper quartile performance</td></tr>
+                </tbody>
+              </table>
+
+              <div class="section-title">3. Sequential Workflow Evaluation</div>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+                ✔ <strong>Step 1 Company ID:</strong> Confirmed ticker [${ticker}]<br>
+                ✔ <strong>Step 2 Financial Summary:</strong> Robust operating cash flows<br>
+                ✔ <strong>Step 3 Sentiment:</strong> Net sentiment score +74 (Positive)<br>
+                ✔ <strong>Step 4 Peer Benchmark:</strong> Premium return profile vs peers
+              </p>
+
+              <div class="section-title">4. Actionable Verdict</div>
+              <div>
+                <span class="tag-recommendation ${tagClass}">${verdict}</span>
+                <span style="font-size: 0.8rem; margin-left: 8px; color: var(--text-muted);">
+                  Target: ${target} | Horizon: 12M
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      chatMessages.insertAdjacentHTML("beforeend", responseHtml);
+      scrollToBottom();
+    }
+
+    function escapeHtml(string) {
+      return String(string).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+  </script>
+</body>
+</html>
